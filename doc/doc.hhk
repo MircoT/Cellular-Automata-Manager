@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBliC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</head>
+<body>
+<ul>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Welcome">
+		<param name="Local" value="welcome.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Installation">
+		<param name="Local" value="installation.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Change log">
+		<param name="Local" value="changelog.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Release notes">
+		<param name="Local" value="releasenotes.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Getting Started">
+		<param name="Local" value="gettingstarted.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Using Menu Commands">
+		<param name="Local" value="usingmenucommands.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Using Toolbar Commands">
+		<param name="Local" value="usingtoolbarcommands.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="The Status Bar">
+		<param name="Local" value="thestatusbar.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Working with Windows">
+		<param name="Local" value="workingwithwindows.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Working with Linux">
+		<param name="Local" value="workingwithlinux.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Linkers Manager">
+		<param name="Local" value="linkersmanager.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="GUI extension">
+		<param name="Local" value="guiextension.html">
+		</object>
+	</li>
+	<li> <object type="text/sitemap">
+		<param name="Name" value="Simulator extension">
+		<param name="Local" value="simulatorextension.html">
+		</object>
+	</li>
+</ul>
+</body>
+</html>

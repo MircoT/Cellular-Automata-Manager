@@ -1,0 +1,6 @@
+include README.md LICENSE
+graft examples
+graft examples/old_examples
+graft doc
+recursive-include assets *.png
+recursive-include doc/img *.png

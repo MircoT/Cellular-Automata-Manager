@@ -1,0 +1,3 @@
+six==1.4.1
+wxPython==2.8.12.0
+pygame==1.9.2a0

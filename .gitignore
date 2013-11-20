@@ -1,0 +1,7 @@
+*.pyc
+*.*~
+*.log
+build
+dist
+venv
+cellular_automata_manager.egg-info
