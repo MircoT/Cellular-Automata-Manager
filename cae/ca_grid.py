@@ -405,8 +405,15 @@ class CellularGrid(object):
         #debug("store_selection", ("ALL", self.__all_selection))
         #debug("store_selection", ("SEL", self.__selection_list))
         #debug("store_selection", ("DICT SEL", self._grid_sel))
+        entities_to_ins = list()
         for point in self.__all_selection:
-            self._grid[point] = self._grid_sel.pop(point, VoidEntity().type) 
+            self.delete(point)
+            try:
+                entities_to_ins.append((point, self._grid_sel.pop(point)))
+            except KeyError:
+                self.insert(point, VoidEntity().type)
+        for point, entity_t in entities_to_ins:
+            self.insert(point, entity_t)
         #self.update_neighbors()
 
     def clear_selection(self):
