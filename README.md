@@ -42,6 +42,10 @@ If you have already installed the program with setuptools toolchain, you can run
 cam-env
 ```
 
+**Notes** : if you are under _Windows_, the _Script_ folder must be on your PATH variable. 
+On _Linux_, if you can't start the application after a correct installation, try
+to use the command ```which cam-env``` to search the executable. 
+
 If you made an executable, you can run the application by running it.
 
 ## Contributing
@@ -49,9 +53,7 @@ If you made an executable, you can run the application by running it.
 Contributions are welcome, so please feel free to fix bugs, improve things, provide documentation. 
 For anything submit a personal message, thanks!
 
-**Notes** : if you are under _Windows_, the _Script_ folder must be on your PATH variable. 
-On _Linux_, if you can't start the application after a correct installation, try
-to use the command ```which cam-env``` to search the executable. 
+
 
 ## License
 Copyright (C) 2013  Mirco Tracolli
