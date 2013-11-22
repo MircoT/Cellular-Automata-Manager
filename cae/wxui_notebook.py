@@ -274,6 +274,7 @@ class GridNotebook(wx.aui.AuiNotebook):
                 file_path = dialog.GetPath()
                 self.__ca_list[self.GetSelection()].clear()
                 self.__ca_list[self.GetSelection()].clear_links()
+                self.__ca_list[self.GetSelection()].clear_selection()
                 self.__ca_list[self.GetSelection()].load(file_path)
                 self.__files_names[self.GetSelection()] = file_path
                 self.SetPageText(self.GetSelection(), path.basename(file_path))
