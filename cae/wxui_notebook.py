@@ -237,6 +237,8 @@ class GridNotebook(wx.aui.AuiNotebook):
     def Export(self):
         """Exports the current grid to a file
         """
+        for x in range(0, len(self.__ca_loop)):
+            self.__ca_loop[x] = False
         if len(self.__ca_list) != 0:
             files_types = "Grid Files (*.cg)|*.cg|File di Testo (*.txt)|*.txt|Tutti i Files (*)|*"
             dialog = wx.FileDialog(
@@ -254,6 +256,8 @@ class GridNotebook(wx.aui.AuiNotebook):
     def save_grid(self):
         """Saves the current grid
         """
+        for x in range(0, len(self.__ca_loop)):
+            self.__ca_loop[x] = False
         if len(self.__ca_list) != 0:
             if self.__files_names[self.GetSelection()] is None:
                 self.Export()
@@ -265,6 +269,8 @@ class GridNotebook(wx.aui.AuiNotebook):
     def Import(self):
         """Imports a grid from a file
         """
+        for x in range(0, len(self.__ca_loop)):
+            self.__ca_loop[x] = False
         if len(self.__ca_list) != 0:
             files_types = "Grid Files (*.cg)|*.cg|File di Testo (*.txt)|*.txt|Tutti i Files (*)|*"
             dialog = wx.FileDialog(

@@ -368,6 +368,11 @@ class DrawWindow(wx.Window):
             self.insert_entity("livingcell")
         elif key == ord("M"):
             self.insert_entity("monoone")
+        elif key == wx.WXK_RETURN:
+            if self.__notman.LoopStart():
+                self.__notman.Stop()
+            else:
+                self.__notman.Play()
         elif key == wx.WXK_SPACE:
             self.__cg.update()
         elif key == wx.WXK_UP:
