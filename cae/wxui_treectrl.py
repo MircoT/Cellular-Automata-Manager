@@ -236,7 +236,7 @@ class GridTreeCtrl(wx.Dialog):
     """Class to manage tree view of imported grids
     """
     def __init__(self, parent):
-        super(GridTreeCtrl, self).__init__(parent, title="Linkers Manager", size=(400,250), style=wx.CAPTION|wx.STAY_ON_TOP)
+        super(GridTreeCtrl, self).__init__(parent, title="Links Manager", size=(400,250), style=wx.CAPTION|wx.STAY_ON_TOP)
         self.__parent = parent
         self._tree = MyTreeCtrl(self, wx.ID_ANY, wx.DefaultPosition, (400,250),
                                wx.TR_DEFAULT_STYLE
