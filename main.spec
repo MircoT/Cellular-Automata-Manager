@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 
 a = Analysis(['.\\main.py'],
-             pathex=['E:\\Projects\\PyScintillae'],
+             pathex=['.'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
