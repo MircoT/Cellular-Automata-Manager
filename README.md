@@ -48,6 +48,8 @@ to use the command ```which cam-env``` to search the executable.
 
 If you made an executable, you can run the application by running it.
 
+For the moment is available also a temporary version of the executable for windows, useful if you want to use the program without install all the dependencies, also on linux and osx with [wine](https://www.winehq.org/). You can download it [here](https://dl.dropboxusercontent.com/u/16546001/cam.zip)
+
 ## Contributing
 
 Contributions are welcome, so please feel free to fix bugs, improve things, provide documentation. 
