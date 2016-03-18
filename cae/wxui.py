@@ -463,7 +463,7 @@ class EditorFrame(wx.Frame):
 
         description = """Open source environment for cellular automata.
         """
-        licenza = """Copyright (C) 2013 Mirco Tracolli
+        licenza = """Copyright (C) 2016 Mirco Tracolli
 
 This program is free software: you can redistribute it and/or modify it underthe terms of
 the GNU General Public License as published by the Free Software Foundation, either version 3

@@ -13,10 +13,11 @@ pip install -r requirements.txt
 
 If you have some troubles, check how to install them on the main site of the libraries:
 * wxPython - [dowload](http://www.wxpython.org/download.php#stable)
-* pygame - [dowload](http://www.pygame.org/download.shtml)
+* PyOpenGL - [dowload](http://pyopengl.sourceforge.net)
+* Pillow - [download](http://python-pillow.org)
 * six - [dowload](https://pypi.python.org/pypi/six)
 
-## Installation
+## Installation (optional)
 
 To install the package, simply launch the command:
 ```bash
@@ -60,7 +61,7 @@ For anything submit a personal message, thanks!
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2015 Mirco
+Copyright (c) 2016 Mirco
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
