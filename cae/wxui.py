@@ -183,14 +183,16 @@ class EditorFrame(wx.Frame):
         """Manage the visualization of the links manager
         """
         # DEBUG
-        #debug("Linkers", ("__linkers_ctrl", self.__linkers_ctrl))
+        # debug("Linkers", ("__linkers_ctrl", self.__linkers_ctrl))
         self.__linkers_ctrl = not self.__linkers_ctrl
         self._menubar.Check(self.__IDs['ID_LINK'], self.__linkers_ctrl)
         self._tb2.ToggleTool(self.__IDs['ID_LINK'], self.__linkers_ctrl)
         if self.__linkers_ctrl:
             self._tree_ctrl.Show()
+            self._tree_ctrl.init_selection()
         else:
             self._tree_ctrl.Hide()
+            self._tree_ctrl.del_selection()
 
     def GetMinimapStatus(self):
         """Return the flag status for minimap button

@@ -12,14 +12,19 @@ TS = 16
 # Smart selection
 SMART_SEL = False
 
+
 class Singleton(type):
+
     """Class for the singleton pattern
     """
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
 
 def debug(message, *args):
     """Print a debug message if debugging is active
@@ -34,6 +39,7 @@ def debug(message, *args):
                 name, value = item
                 logger.debug(" -- %s -> %s", name, value)
             logger.debug(" --]")
+
 
 def rotate_point(point, pivot, degrees):
     """Rotate the point for tot degrees respect the pivot

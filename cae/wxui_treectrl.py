@@ -4,15 +4,19 @@ from .ca_link import LINK_TYPE_IDS, LINK_TYPE_NAMES
 from six import add_metaclass
 from random import randint
 
+
 def get_random_color():
-    red = randint(0,255)
-    green = randint(0,255)
-    blue = randint(0,255)
+    red = randint(0, 255)
+    green = randint(0, 255)
+    blue = randint(0, 255)
     return (red, green, blue)
 
+
 class ChangeSpeedDialog(wx.Dialog):
+
     """Dialog frame to change grids' speed
     """
+
     def __init__(self, parent, id_=None):
         super(ChangeSpeedDialog, self).__init__(parent, wx.ID_ANY, "Speed")
         self.__parent = parent
@@ -50,8 +54,10 @@ class ChangeSpeedDialog(wx.Dialog):
 
 
 class MyTreeCtrl(wx.TreeCtrl):
+
     """Widget to manage imported grids
     """
+
     def __init__(self, parent, id_, pos, size, style):
         super(MyTreeCtrl, self).__init__(parent, id_, pos, size, style)
         self.item = None
@@ -65,12 +71,19 @@ class MyTreeCtrl(wx.TreeCtrl):
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
 
+    def del_selection(self):
+        self.__notman.SetLinkSelection([])
+
+    def init_selection(self):
+        self.__notman.SetLinkSelection(self.__selection)
+
     def set_notebook(self, notebook):
         """Sets notebook's reference
         """
         self.__notman = notebook
         self.DeleteChildren(self.__root)
-        first = self.AppendItem(self.__root, "--- THIS GRID --- with speed = %s" % self.__notman.GetSpeed())
+        first = self.AppendItem(
+            self.__root, "--- THIS GRID --- with speed = %s" % self.__notman.GetSpeed())
         self.SetItemBackgroundColour(first, get_random_color())
 
     def OnSelChanged(self, e):
@@ -80,20 +93,25 @@ class MyTreeCtrl(wx.TreeCtrl):
             text = self.GetItemText(self.GetSelection())
             if text.find("->") != -1:
                 type_ = id_ = pos = name = None
-                parent_text = self.GetItemText(self.GetItemParent(self.GetSelection()))
-                name, id_ = parent_text.split(" - with speed =")[0].split(" | id:")
+                parent_text = self.GetItemText(
+                    self.GetItemParent(self.GetSelection()))
+                name, id_ = parent_text.split(
+                    " - with speed =")[0].split(" | id:")
                 id_ = int(id_)
                 if text.find("from") != -1:
                     type_, pos = text.split(" from -> ")
                     type_ = LINK_TYPE_NAMES[type_]
-                    pos = map(int, pos.replace("(", "").replace(")","").split(","))
+                    pos = map(
+                        int, pos.replace("(", "").replace(")", "").split(","))
                     pos = Point(pos[0], pos[1])
                 elif text.find("to") != -1:
                     type_, pos = text.split(" to -> ")
                     type_ = LINK_TYPE_NAMES[type_]
-                    pos = map(int, pos.replace("(", "").replace(")","").split(","))
+                    pos = map(
+                        int, pos.replace("(", "").replace(")", "").split(","))
                     pos = Point(pos[0], pos[1])
-                color = self.GetItemBackgroundColour(self.GetItemParent(self.GetSelection()))
+                color = self.GetItemBackgroundColour(
+                    self.GetItemParent(self.GetSelection()))
                 self.__selection = (color, id_, pos, type_)
             elif text.find("|") != -1:
                 name, id_ = text.split(" - with speed =")[0].split(" | id:")
@@ -112,15 +130,17 @@ class MyTreeCtrl(wx.TreeCtrl):
         """Update the grids' tree
         """
         self.DeleteChildren(self.__root)
-        first = self.AppendItem(self.__root, "--- THIS GRID --- with speed = %s" % self.__notman.GetSpeed())
+        first = self.AppendItem(
+            self.__root, "--- THIS GRID --- with speed = %s" % self.__notman.GetSpeed())
         if "first" not in self.__mem_color:
-            self.__mem_color['first'] =  get_random_color()
+            self.__mem_color['first'] = get_random_color()
         self.SetItemBackgroundColour(first, self.__mem_color['first'])
         if self.__notman:
             for id_, links, name, speed in self.__notman.get_linked_grids():
                 if id_ not in self.__mem_color:
-                    self.__mem_color[id_] =  get_random_color()
-                child = self.AppendItem(self.__root, "%s | id:%s - with speed = %s" % (name, id_, speed))
+                    self.__mem_color[id_] = get_random_color()
+                child = self.AppendItem(
+                    self.__root, "%s | id:%s - with speed = %s" % (name, id_, speed))
                 self.SetItemBackgroundColour(child, self.__mem_color[id_])
                 for pos, type_ in links:
                     if type_ == LINK_TYPE_NAMES["IN"]:
@@ -152,7 +172,7 @@ class MyTreeCtrl(wx.TreeCtrl):
         """
         files_types = "Grid Files (*.cg)|*.cg|File di Testo (*.txt)|*.txt|Tutti i Files (*)|*"
         dialog = wx.FileDialog(
-            self, message="Open grid file", wildcard=files_types, style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST
+            self, message="Open grid file", wildcard=files_types, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
         )
         if dialog.ShowModal() == wx.ID_OK:
             path = dialog.GetPath()
@@ -164,17 +184,19 @@ class MyTreeCtrl(wx.TreeCtrl):
         """Change a color of a selected item randomly
         """
         # DEBUG
-        #debug("ChangeRandomColor")
+        # debug("ChangeRandomColor")
         if self.GetItemText(self.GetSelection()).find("THIS") != -1:
             self.__mem_color['first'] = get_random_color()
-            self.SetItemBackgroundColour(self.GetSelection(), self.__mem_color['first'])
+            self.SetItemBackgroundColour(
+                self.GetSelection(), self.__mem_color['first'])
         else:
             text = self.GetItemText(self.GetSelection())
             name, id_ = text.split(" - with speed =")[0].split(" | id:")
             self.__mem_color[int(id_)] = get_random_color()
-            self.SetItemBackgroundColour(self.GetSelection(), self.__mem_color[int(id_)])
+            self.SetItemBackgroundColour(
+                self.GetSelection(), self.__mem_color[int(id_)])
         self.ToggleItemSelection(self.GetSelection())
-    
+
     def OnDown(self, event):
         """On down tree event
         """
@@ -186,7 +208,7 @@ class MyTreeCtrl(wx.TreeCtrl):
         else:
             self.__notman.SetLinkSelection(self.__selection)
             self.UnselectAll()
-    
+
     def SetSpeed(self, speed, id_):
         """Set the speed of a grid
         """
@@ -195,7 +217,7 @@ class MyTreeCtrl(wx.TreeCtrl):
         else:
             self.__notman.SetGridsSpeed(speed, id_)
         self.UpdateTree()
-    
+
     def ChangeSpeed(self, event):
         """Calling the dialog to change the speed of a grid
         """
@@ -203,7 +225,7 @@ class MyTreeCtrl(wx.TreeCtrl):
             ChangeSpeedDialog(self, self.__selection[1])
         else:
             ChangeSpeedDialog(self)
-            
+
     def OnRightUp(self, event):
         """On right up tree event
         """
@@ -226,32 +248,36 @@ class MyTreeCtrl(wx.TreeCtrl):
                 change_speed = menu.Append(wx.ID_ANY, "Change speed")
                 self.Bind(wx.EVT_MENU, self.ChangeRandomColor, change_color)
                 self.Bind(wx.EVT_MENU, self.ChangeSpeed, change_speed)
-        
+
         self.PopupMenu(menu)
         menu.Destroy()
         event.Skip()
 
+
 @add_metaclass(Singleton)
 class GridTreeCtrl(wx.Dialog):
+
     """Class to manage tree view of imported grids
     """
+
     def __init__(self, parent):
-        super(GridTreeCtrl, self).__init__(parent, title="Links Manager", size=(400,250), style=wx.CAPTION|wx.STAY_ON_TOP)
+        super(GridTreeCtrl, self).__init__(parent, title="Links Manager",
+                                           size=(400, 250), style=wx.CAPTION | wx.STAY_ON_TOP)
         self.__parent = parent
-        self._tree = MyTreeCtrl(self, wx.ID_ANY, wx.DefaultPosition, (400,250),
-                               wx.TR_DEFAULT_STYLE
-                               |wx.TR_LINES_AT_ROOT
-                               |wx.TR_FULL_ROW_HIGHLIGHT
-                               |wx.TR_SINGLE
-                               |wx.TR_HIDE_ROOT
-                               #wx.TR_HAS_BUTTONS
-                               #| wx.TR_EDIT_LABELS
-                               #| wx.TR_MULTIPLE
-                               #| wx.TR_HIDE_ROOT
-        )
+        self._tree = MyTreeCtrl(self, wx.ID_ANY, wx.DefaultPosition, (400, 250),
+                                wx.TR_DEFAULT_STYLE
+                                | wx.TR_LINES_AT_ROOT
+                                | wx.TR_FULL_ROW_HIGHLIGHT
+                                | wx.TR_SINGLE
+                                | wx.TR_HIDE_ROOT
+                                # wx.TR_HAS_BUTTONS
+                                #| wx.TR_EDIT_LABELS
+                                #| wx.TR_MULTIPLE
+                                #| wx.TR_HIDE_ROOT
+                                )
         s = wx.BoxSizer()
-        s.Add(self._tree, 0, wx.EXPAND|wx.ALL)
-    
+        s.Add(self._tree, 0, wx.EXPAND | wx.ALL)
+
     def UpdateTree(self):
         """Update the tree view
         """
@@ -261,3 +287,9 @@ class GridTreeCtrl(wx.Dialog):
         """Set the notebook for the tree
         """
         self._tree.set_notebook(notebook)
+
+    def del_selection(self):
+        self._tree.del_selection()
+
+    def init_selection(self):
+        self._tree.init_selection()

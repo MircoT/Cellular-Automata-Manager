@@ -11,8 +11,9 @@ from six import add_metaclass
 
 @add_metaclass(Singleton)
 class GridNotebook(wx.aui.AuiNotebook):
+
     def __init__(self, *args, **kwargs):
-        super(GridNotebook, self).__init__( *args, **kwargs)
+        super(GridNotebook, self).__init__(*args, **kwargs)
         self.__parent = args[0]
         self.__ca_list = list()
         self.__ca_loop = list()
@@ -24,27 +25,27 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__loop_started = False
         self.__gtree = None
         self.__files_names = list()
-        
+
         # Events list for AUI notebook:
-        #EVT_AUINOTEBOOK_ALLOW_DND 
-        #EVT_AUINOTEBOOK_BEGIN_DRAG 
-        #EVT_AUINOTEBOOK_BUTTON 
-        #EVT_AUINOTEBOOK_DRAG_MOTION 
-        #EVT_AUINOTEBOOK_END_DRAG 
-        #EVT_AUINOTEBOOK_PAGE_CHANGED 
-        #EVT_AUINOTEBOOK_PAGE_CHANGING 
-        #EVT_AUINOTEBOOK_PAGE_CLOSE 
-        #EVT_AUI_FIND_MANAGER 
-        #EVT_AUI_PANE_BUTTON 
-        #EVT_AUI_PANE_CLOSE 
-        #EVT_AUI_PANE_MAXIMIZE 
-        #EVT_AUI_PANE_RESTORE 
-        #EVT_AUI_RENDER 
+        # EVT_AUINOTEBOOK_ALLOW_DND
+        # EVT_AUINOTEBOOK_BEGIN_DRAG
+        # EVT_AUINOTEBOOK_BUTTON
+        # EVT_AUINOTEBOOK_DRAG_MOTION
+        # EVT_AUINOTEBOOK_END_DRAG
+        # EVT_AUINOTEBOOK_PAGE_CHANGED
+        # EVT_AUINOTEBOOK_PAGE_CHANGING
+        # EVT_AUINOTEBOOK_PAGE_CLOSE
+        # EVT_AUI_FIND_MANAGER
+        # EVT_AUI_PANE_BUTTON
+        # EVT_AUI_PANE_CLOSE
+        # EVT_AUI_PANE_MAXIMIZE
+        # EVT_AUI_PANE_RESTORE
+        # EVT_AUI_RENDER
         self.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         self.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
         self.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnPageClose)
         self.NewGrid()
-        
+
         # TO SET PAGE NAME
         #self.SetPageText(sel, "Grid %d" % sel)
 
@@ -113,7 +114,8 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Update the current selection
         """
         self.__ca_list[self.GetSelection()].clear_selection()
-        selected_cels = self.__renderer_list[self.GetSelection()].GetSelection()
+        selected_cels = self.__renderer_list[
+            self.GetSelection()].GetSelection()
         self.__ca_list[self.GetSelection()].select_entities(selected_cels)
 
     def undo(self):
@@ -149,9 +151,11 @@ class GridNotebook(wx.aui.AuiNotebook):
         """
         self.__smart_selection = not self.__smart_selection
         if self.__smart_selection:
-            StatusBarManager().UpdateStatusBar(None, "Smart selection activated")
+            StatusBarManager().UpdateStatusBar(
+                None, "Smart selection activated")
         else:
-            StatusBarManager().UpdateStatusBar(None, "Smart selection not active")
+            StatusBarManager().UpdateStatusBar(
+                None, "Smart selection not active")
 
     def smart(self):
         """Return the status for smart selection
@@ -165,12 +169,14 @@ class GridNotebook(wx.aui.AuiNotebook):
         for pos, type_ in self.__ca_list[self.GetSelection()].get_entities_to_copy():
             self.__clipboard[pos] = type_
             self.__ca_list[self.GetSelection()].delete(pos)
-        self.__clipboard_point = self.__renderer_list[self.GetSelection()].get_paste_pos()
-        selected_cels = self.__renderer_list[self.GetSelection()].GetSelection()
+        self.__clipboard_point = self.__renderer_list[
+            self.GetSelection()].get_paste_pos()
+        selected_cels = self.__renderer_list[
+            self.GetSelection()].GetSelection()
         self.__ca_list[self.GetSelection()].select_entities(selected_cels)
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def copy(self):
         """Copies some entities from the current grid
@@ -178,7 +184,8 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__clipboard = dict()
         for pos, type_ in self.__ca_list[self.GetSelection()].get_entities_to_copy():
             self.__clipboard[pos] = type_
-        self.__clipboard_point = self.__renderer_list[self.GetSelection()].get_paste_pos()
+        self.__clipboard_point = self.__renderer_list[
+            self.GetSelection()].get_paste_pos()
         #debug("copy", ("clipboard", self.__clipboard))
 
     def paste(self):
@@ -190,12 +197,14 @@ class GridNotebook(wx.aui.AuiNotebook):
         for pos, type_ in self.__clipboard.viewitems():
             p_x, p_y = pos
             #debug("paste", ("pos", (p_x + dif_x, p_y + dif_y)), ("type", type_))
-            self.__ca_list[self.GetSelection()].insert(Point(p_x + dif_x, p_y + dif_y), type_)
-        selected_cels = self.__renderer_list[self.GetSelection()].GetSelection()
+            self.__ca_list[self.GetSelection()].insert(
+                Point(p_x + dif_x, p_y + dif_y), type_)
+        selected_cels = self.__renderer_list[
+            self.GetSelection()].GetSelection()
         self.__ca_list[self.GetSelection()].select_entities(selected_cels)
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def NewGrid(self):
         """Inserts a new tab with a new grid
@@ -223,8 +232,8 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__ca_list[self.GetSelection()].clear_links()
         self.__ca_list[self.GetSelection()].push_actions()
         self.__gtree.UpdateTree()
-        self.check_unredo()        
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        self.check_unredo()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def ClearSparks(self):
         """Delete all sparks from the current grid
@@ -232,7 +241,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__ca_list[self.GetSelection()].clear_sparks()
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def Export(self):
         """Exports the current grid to a file
@@ -242,14 +251,15 @@ class GridNotebook(wx.aui.AuiNotebook):
         if len(self.__ca_list) != 0:
             files_types = "Grid Files (*.cg)|*.cg|File di Testo (*.txt)|*.txt|Tutti i Files (*)|*"
             dialog = wx.FileDialog(
-                self, message="Salva come", defaultFile = ".cg", wildcard=files_types, style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT
+                self, message="Salva come", defaultFile=".cg", wildcard=files_types, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
             )
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
                 self.__ca_list[self.GetSelection()].store(file_path)
                 self.__files_names[self.GetSelection()] = file_path
                 self.SetPageText(self.GetSelection(), path.basename(file_path))
-                self.__parent.set_title(path.basename(file_path), path.dirname(file_path))
+                self.__parent.set_title(
+                    path.basename(file_path), path.dirname(file_path))
             dialog.Destroy()
             StatusBarManager().UpdateStatusBar("Grid exported!")
 
@@ -274,7 +284,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         if len(self.__ca_list) != 0:
             files_types = "Grid Files (*.cg)|*.cg|File di Testo (*.txt)|*.txt|Tutti i Files (*)|*"
             dialog = wx.FileDialog(
-                self, message="Open grid file", wildcard=files_types, style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST
+                self, message="Open grid file", wildcard=files_types, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
             )
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
@@ -284,8 +294,9 @@ class GridNotebook(wx.aui.AuiNotebook):
                 self.__ca_list[self.GetSelection()].load(file_path)
                 self.__files_names[self.GetSelection()] = file_path
                 self.SetPageText(self.GetSelection(), path.basename(file_path))
-                self.__parent.set_title(path.basename(file_path), path.dirname(file_path))
-                #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+                self.__parent.set_title(
+                    path.basename(file_path), path.dirname(file_path))
+                # self.__renderer_list[self.GetSelection()].UpdateDrawing()
             dialog.Destroy()
             self.__ca_list[self.GetSelection()].push_actions()
             self.__gtree.UpdateTree()
@@ -296,14 +307,14 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Returns the last grid inserted
         """
         return self.__ca_list[-1]
-    
+
     def Insert(self, type_):
         """Insert an entity on the current grid
         """
         self.__renderer_list[self.GetSelection()].insert_entity(type_)
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
-    
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
+
     def Rotate(self, deg):
         """Rotates some entities on the current grid
         """
@@ -313,7 +324,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         self._update_selection()
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def FlipH(self):
         """Flips horizonally some entities on the current grid
@@ -323,7 +334,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         self._update_selection()
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def FlipV(self):
         """Flips vertically some entities on the current grid
@@ -333,7 +344,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         self._update_selection()
         self.__ca_list[self.GetSelection()].push_actions()
         self.check_unredo()
-        #self.__renderer_list[self.GetSelection()].UpdateDrawing()
+        # self.__renderer_list[self.GetSelection()].UpdateDrawing()
 
     def PlayLoop(self, sel):
         """Continually updates the current grid if play button for this
@@ -343,7 +354,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         #debug("RENDER LOOP", ("Selection", sel))
         if self.__ca_loop[sel]:
             self.__ca_list[sel].update()
-            #self.__renderer_list[sel].UpdateDrawing()
+            # self.__renderer_list[sel].UpdateDrawing()
             wx.CallLater(self.__delay, self.PlayLoop, sel)
 
     def Step(self):
@@ -364,7 +375,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__ca_loop[self.GetSelection()] = True
         # DEBUG
         #debug("PLAY COUNT", ("loop count", self.__ca_loop.count(True)))
-        #if self.__ca_loop.count(True) == 1:
+        # if self.__ca_loop.count(True) == 1:
         self.PlayLoop(self.GetSelection())
         self.__parent.PlayOn()
 
@@ -393,7 +404,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Close tab event
         """
         # DEBUG
-        #debug("OnPageClose")
+        # debug("OnPageClose")
         selection = self.GetSelection()
         self.__ca_loop[selection] = False
         self.__ca_list.pop(selection)
@@ -406,7 +417,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Change tab event
         """
         # DEBUG
-        #debug("OnPageChanged")
+        # debug("OnPageChanged")
         old = event.GetOldSelection()
         new = event.GetSelection()
         sel = self.GetSelection()
@@ -416,7 +427,8 @@ class GridNotebook(wx.aui.AuiNotebook):
         self.__renderer_list[old].stop_timer()
         self.__renderer_list[sel].start_timer()
         if self.__files_names[sel] is not None:
-            self.SetPageText(self.GetSelection(), path.basename(self.__files_names[sel]))
+            self.SetPageText(
+                self.GetSelection(), path.basename(self.__files_names[sel]))
             self.__parent.set_title(
                 path.basename(self.__files_names[sel]),
                 path.dirname(self.__files_names[sel])
@@ -438,7 +450,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Changing tab event
         """
         # DEBUG
-        #debug("OnPageChanging")
+        # debug("OnPageChanging")
         old = event.GetOldSelection()
         new = event.GetSelection()
         sel = self.GetSelection()
@@ -450,4 +462,3 @@ class GridNotebook(wx.aui.AuiNotebook):
         """Function to exit from the whole program
         """
         self.__parent.OnExit()
-    

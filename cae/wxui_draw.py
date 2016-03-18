@@ -6,6 +6,7 @@ from .ca_base_entity import ENTITIES_NAMES, ENTITIES_IDS
 from .ca_link import LINK_TYPE_NAMES, LINK_TYPE_IDS
 from .wxui_resman import ResourceManager
 from .wxui_staman import StatusBarManager
+from OpenGL import GL as gl
 
 
 class DrawWindow(MyGLCanvas):
@@ -32,9 +33,20 @@ class DrawWindow(MyGLCanvas):
         # Other variables -----
         self.__link_selection = []
         self.__resman = ResourceManager()  # Resource manager
+
+        for entity_name, image in self.__resman.entity.items():
+            self.add_texture(
+                image,
+                name=entity_name
+            )
+        for tool_name, image in self.__resman.tool.items():
+            self.add_texture(
+                image,
+                name=tool_name
+            )
+
         self.__notman = None  # Notebook manager
-        self._size = self.GetSizeTuple()  # Window size
-        self._size_dirty = True
+        self._size_t = self.GetSizeTuple()  # Window size
         self._screen = None
         # Device context for drawing the bitmap
         self._wx_dc = None
@@ -253,7 +265,7 @@ class DrawWindow(MyGLCanvas):
         """
         move = event.GetWheelRotation()/event.GetWheelDelta()
         pox_x, pos_y = event.GetPositionTuple()
-        win_x, win_y = self._size
+        win_x, win_y = self._size_t
         if pox_x >= win_x - 25 and pox_x <= win_x and\
                 pos_y >= 0 and pos_y <= win_y - 16:
             # Vertical scroll
@@ -267,7 +279,7 @@ class DrawWindow(MyGLCanvas):
         """Mouse motion event
         """
         position = event.GetPositionTuple()
-        win_x, win_y = self._size
+        win_x, win_y = self._size_t
         if position[0] >= win_x - 16 and position[0] <= win_x and\
                 position[1] >= 0 and position[1] <= win_y - 16:
             self.__show_ver_scrol = True
@@ -424,107 +436,133 @@ class DrawWindow(MyGLCanvas):
                 Point((win_x / TS) + x_c, win_y - (win_y / TS)*2 + y_c))
 
     def draw(self):
-        pass
-    ##
-    # Function that draws all entities on screen with pygame ------------------
-    def Redraw(self):
-        """Method called to draw
-        """
-        if self._size_dirty:
-            self._screen = pygame.Surface(self._size, 0, 24)
-            self._size_dirty = False
+        self.SetCurrent(self._gl_context)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+        gl.glLoadIdentity()
 
-        win_x, win_y = self._size
-        # Clear the screen -----
-        for x in range(0, win_x / 512 + 2):
-            for y in range(0, win_y / 512 + 2):
-                self._screen.blit(
-                    self.__resman.entity.background, (x*512, y*512))
+        win_x, win_y = self._size_t
 
-        # Draw selection -----
+        def conv_y(cur_y):
+            return win_y - cur_y - win_y % TS
+
+        def conv_color(RGBA, new_alpha=None):
+            return (RGBA[0] / 255., RGBA[1] / 255., RGBA[2] / 255., RGBA[3] / 255. if new_alpha is None else new_alpha)
+        ##
+        # Draw lines
+        for x_c in range(0, win_x / TS + TS*2):
+            self.draw_line(
+                x_c*TS, 0, x_c*TS, win_y, color=(0.0, 0.0, 0.0, 0.1))
+        for y_c in range(0, win_y / TS + TS*2):
+            self.draw_line(
+                0, y_c*TS, win_x, y_c*TS, color=(0.0, 0.0, 0.0, 0.1))
+        ##
+        # Draw selection
         if len(self.__selected_cels) != 0:
             max_x, max_y = max(self.__selected_cels)
             min_x, min_y = min(self.__selected_cels)
-            pygame.draw.rect(self._screen, (5, 5, 5), [
-                             min_x*TS, min_y*TS, (max_x - min_x + 1) * TS, (max_y - min_y + 1) * TS], 2)
+            o_x = min_x*TS
+            o_y = conv_y(min_y*TS)
+            width = (max_x - min_x + 1) * TS
+            height = (max_y - min_y + 1) * TS
 
-        # Draw lines -----
-        for x_c in range(0, win_x / TS + 1):
-            pygame.draw.line(
-                self._screen, (100, 100, 100), (x_c*TS, 0), (x_c*TS, win_y), 1)
-        for y_c in range(0, win_y / TS + 1):
-            pygame.draw.line(
-                self._screen, (100, 100, 100), (0, y_c*TS), (win_x, y_c*TS), 1)
+            self.draw_line(o_x, o_y, o_x+width, o_y,
+                           color=(0.0, 0.0, 0.0, 0.5))
+            self.draw_line(o_x, o_y, o_x, o_y-height,
+                           color=(0.0, 0.0, 0.0, 0.5))
+            self.draw_line(o_x+width, o_y, o_x+width, o_y-height,
+                           color=(0.0, 0.0, 0.0, 0.5))
+            self.draw_line(o_x, o_y-height, o_x+width, o_y-height,
+                           color=(0.0, 0.0, 0.0, 0.5))
 
+        ##
+        # Minimap points
         if self.__minimap:
             points = list()
 
-        # Draw my_links -----
+        ##
+        # Draw my_links
         for pos, type_ in self.__cg.get_my_links():
             # DEBUG
-            #debug("links", ("stat", (pos, type_)))
+            # debug("links", ("stat", (pos, type_)))
             x_c, y_c = pos
             if self.__minimap:
                 self.__add_on_minimap(win_x, win_y, x_c, y_c, points)
-            x_c, y_c = x_c*TS, y_c*TS
+            x_c, y_c = x_c*TS, conv_y(y_c*TS)-TS
             if x_c >= 0 and x_c < win_x and \
                     y_c >= 0 and y_c < win_y:
                 try:
                     # Same id of the selection
                     if len(self.__link_selection) == 1:
-                        pygame.draw.rect(
-                            self._screen, self.__link_selection[0], [x_c, y_c, TS, TS], 1)
+                        self.draw_rect(
+                            x_c, y_c, TS, TS, color=conv_color(
+                                self.__link_selection[0].Get(True), 0.2))
                 # on deleting links it can return wx.Colour(-1, -1, -1, 255)
                 except TypeError:
                     pass
                 if type_ == LINK_TYPE_NAMES["IN"]:
-                    self._screen.blit(self.__resman.tool.linkin, (x_c, y_c))
+                    self.draw_image('linkin', x_c, y_c, TS, TS)
                 elif type_ == LINK_TYPE_NAMES["OUT"]:
-                    self._screen.blit(self.__resman.tool.linkout, (x_c, y_c))
+                    self.draw_image('linkout', x_c, y_c, TS, TS)
 
-        # Draw links -----
+        ##
+        # Draw links
         for pos, type_, id_, id_pos in self.__cg.get_links():
             # DEBUG
-            #debug("links", ("stat", (pos, type_, id_)))
+            # debug("links", ("stat", (pos, type_, id_)))
             x_c, y_c = pos
             if self.__minimap:
                 self.__add_on_minimap(win_x, win_y, x_c, y_c, points)
-            x_c, y_c = x_c*TS, y_c*TS
+            x_c, y_c = x_c*TS, conv_y(y_c*TS)-TS
             if x_c >= 0 and x_c < win_x and \
                     y_c >= 0 and y_c < win_y:
                 try:
                     if len(self.__link_selection) == 2\
                             and id_ == self.__link_selection[1]:  # Same id of the selection
-                        pygame.draw.rect(
-                            self._screen, self.__link_selection[0], [x_c, y_c, TS, TS], 1)
+                        self.draw_rect(
+                            x_c, y_c, TS, TS, color=conv_color(
+                                self.__link_selection[0].Get(True), 0.2))
                     elif len(self.__link_selection) == 4\
                             and id_ == self.__link_selection[1]\
                             and type_ == self.__link_selection[3]\
                             and id_pos == self.__link_selection[2]:
-                        pygame.draw.rect(
-                            self._screen, self.__link_selection[0], [x_c, y_c, TS, TS], 1)
+                        self.draw_rect(
+                            x_c, y_c, TS, TS, color=conv_color(
+                                self.__link_selection[0].Get(True), 0.2))
                 # on deleting links it can return wx.Colour(-1, -1, -1, 255)
                 except TypeError:
                     pass
                 if type_ == LINK_TYPE_NAMES["IN"]:
-                    self._screen.blit(self.__resman.tool.linkin, (x_c, y_c))
+                    self.draw_image('linkin', x_c, y_c, TS, TS)
                 elif type_ == LINK_TYPE_NAMES["OUT"]:
-                    self._screen.blit(self.__resman.tool.linkout, (x_c, y_c))
+                    self.draw_image('linkout', x_c, y_c, TS, TS)
 
-        # Draw entities -----
+        ##
+        # Draw entities
         for position, entity in self.__cg.get_entities():
-            #debug("FOR", ("entity", entity), ("position", position))
+            # debug("FOR", ("entity", entity), ("position", position))
             x_c, y_c = position
             if self.__minimap and ENTITIES_IDS[entity] in self.__resman.entity:
                 self.__add_on_minimap(win_x, win_y, x_c, y_c, points)
-            x_c, y_c = x_c*TS, y_c*TS
+            x_c, y_c = x_c*TS, conv_y(y_c*TS)-TS
             if x_c >= 0 and x_c < win_x and \
                     y_c >= 0 and y_c < win_y:
                 # DEBUG
-                #debug("Draw", ("position", (x_c, y_c)))
+                # debug("Draw", ("position", (x_c, y_c)))
                 if ENTITIES_IDS[entity] in self.__resman.entity:
-                    self._screen.blit(
-                        self.__resman.entity[ENTITIES_IDS[entity]], (x_c, y_c))
+                    self.draw_image(ENTITIES_IDS[entity], x_c, y_c, TS, TS, )
+
+        self.SwapBuffers()
+
+    ##
+    # Function that draws all entities on screen with pygame ------------------
+    def Redraw(self):
+        """Method called to draw
+        """
+        if self._size_t_dirty:
+            self._screen = pygame.Surface(self._size_t, 0, 24)
+            self._size_t_dirty = False
+
+        
 
         # Draw scrollbars -----
         if self.__show_hor_scrol:
@@ -581,7 +619,7 @@ class DrawWindow(MyGLCanvas):
         # Convert the surface to an RGB string
         temp_s = pygame.image.tostring(self._screen, 'RGB')
         # Load this string into a wx image
-        img = wx.ImageFromData(self._size[0], self._size[1], temp_s)
+        img = wx.ImageFromData(self._size_t[0], self._size_t[1], temp_s)
         # Get the image in bitmap form because
         # we can't render an image directly on context
         bmp = wx.BitmapFromImage(img)

@@ -14,6 +14,8 @@ GLENV = __GL_ENVS(*range(len(__ENVS)))
 
 class MyGLCanvas(GLCanvas):
 
+    """Class to manage an OpenGL canvas in wxPython."""
+
     def __init__(self, parent, *args, **kwargs):
         super(MyGLCanvas, self).__init__(parent)
 
@@ -21,6 +23,7 @@ class MyGLCanvas(GLCanvas):
         self._gl_context = GLContext(self)
         self._gl_initialized = False
         self._wx_size = wx.Size(42, 42)
+        self._size_t = self.GetSizeTuple()
         self._textures = {}
 
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
@@ -44,17 +47,13 @@ class MyGLCanvas(GLCanvas):
     def OnPaint(self, event):
         """Method that draw on the context."""
         # Draw contents
-        self.SetCurrent(self._gl_context)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
-        gl.glLoadIdentity()
         self.draw()
-        self.SwapBuffers()
         event.Skip()
 
     def _init_GL(self):
         """Initialize OpenGwidthL context."""
         self.SetCurrent(self._gl_context)
-        self.def_clear_color(0.69, 0.80, 0.90, 1.0)
+        self.def_clear_color(0.98, 0.98, 0.98, 1.0)
         if self._env_type == GLENV.env2d:
             self._conf_2d_env()
         else:
@@ -73,11 +72,12 @@ class MyGLCanvas(GLCanvas):
         gl.glLoadIdentity()
         # Lines
         gl.glEnable(gl.GL_LINE_SMOOTH)
-        gl.glLineWidth(1.0width)
+        gl.glLineWidth(1.0)
 
     def _set_viewport(self):
         """Set viewport size as Client dimension."""
         self._wx_size = self.GetSize()
+        self._size_t = self.GetSizeTuple()
         self.SetCurrent(self._gl_context)
         gl.glViewport(0, 0, self._wx_size.width, self._wx_size.height)
         self._conf_2d_env()
@@ -92,6 +92,9 @@ class MyGLCanvas(GLCanvas):
             a (float): alpha value
         """
         gl.glClearColor(r, g, b, a)
+
+    def check_texture(self, name):
+        return name in self._textures
 
     def add_texture(self, image, name=None,
                     t_wrap_s=gl.GL_REPEAT,
@@ -224,7 +227,9 @@ class MyGLCanvas(GLCanvas):
         gl.glDisable(gl.GL_BLEND)
         gl.glDisable(gl.GL_TEXTURE_2D)
 
-    def draw_rect(self, x, y, width, height):
+    def draw_rect(self, x, y, width, height, color=(1.0, 1.0, 1.0, 1.0)):
+        gl.glColor4f(*color)
+
         # Begin QUAD
         gl.glBegin(gl.GL_QUADS)
         # bottom left point
@@ -238,17 +243,44 @@ class MyGLCanvas(GLCanvas):
         # End QUAD
         gl.glEnd()
 
-    def draw_line(self, start_x, start_y, end_x, end_y):
+    def draw_line(self, start_x, start_y, end_x, end_y,
+                  color=(1.0, 1.0, 1.0, 1.0),
+                  width=None):
+        gl.glColor4f(*color)
+
+        prev_width = None
+        if width is not None:
+            prev_width = gl.glGetFloat(gl.GL_LINE_WIDTH)
+            gl.glLineWidth(width)
+
         gl.glEnable(gl.GL_BLEND)
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
         gl.glHint(gl.GL_LINE_SMOOTH_HINT, gl.GL_DONT_CARE)
 
         gl.glBegin(gl.GL_LINES)
+
         gl.glVertex2f(start_x, start_y)
         gl.glVertex2f(end_x, end_y)
+
         gl.glEnd()
         gl.glDisable(gl.GL_BLEND)
 
+        if prev_width is not None:
+            gl.glLineWidth(prev_width)
+
     def draw(self):
-        """Abstract method to draw on the canvas."""
+        """Abstract method to draw on the canvas.
+
+        Example of code:
+
+        def draw(self):
+            self.SetCurrent(self._gl_context)
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+            gl.glLoadIdentity()
+            ...
+            ...
+            ...
+            self.SwapBuffers()
+
+        """
         raise NotImplementedError

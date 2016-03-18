@@ -3,6 +3,7 @@ from sys import exit, argv
 import logging
 from cae.utils import debug
 
+
 def main():
     if len(argv) == 1:
         my_app = App()

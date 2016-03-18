@@ -2,6 +2,7 @@ import wx
 from .utils import Singleton
 from os import path, walk
 from six import add_metaclass
+from PIL import Image
 
 
 class Container(dict):
@@ -36,8 +37,9 @@ class ResourceManager(object):
                     if type_ == "icon":
                         self.__resources[type_][name] = wx.Icon(
                             path.join(root, file_), wx.BITMAP_TYPE_PNG)
-                    # elif type_ == "entity" or type_ == "tool":
-                    #    self.__resources[type_][name] = pygame.image.load(path.join(root, file_))
+                    elif type_ == "entity" or type_ == "tool":
+                        self.__resources[type_][name] = Image.open(
+                            path.join(root, file_))
                     else:
                         self.__resources[type_][name] = wx.Bitmap(
                             path.join(root, file_), wx.BITMAP_TYPE_PNG)
