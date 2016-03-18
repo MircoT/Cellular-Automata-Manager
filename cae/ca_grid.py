@@ -9,9 +9,12 @@ from collections import defaultdict
 from six import add_metaclass
 from os import path
 
+
 class BaseGrid(defaultdict):
+
     """The base object to memorize all entities
     """
+
     def __missing__(self, key):
         if self.default_factory is None:
             raise KeyError(key)
@@ -20,9 +23,12 @@ class BaseGrid(defaultdict):
             ret = self[key] = self.default_factory(VoidEntity().type)
             return ret
 
+
 class HistoryExtension(object):
+
     """Extension for CellularGrid to manage history of actions
     """
+
     def undo(self):
         """Undo last action
         """
@@ -59,25 +65,30 @@ class HistoryExtension(object):
         while len(self._actions_dicts) != self._actions_index + 1:
             self._actions_dicts.pop()
         if len(self._actions_dicts) <= self._max_actions:
-            self._actions_dicts.append(dict((point, entity_t) for point, entity_t in self._grid.viewitems() if entity_t != ENTITIES_NAMES['void']))
+            self._actions_dicts.append(dict((point, entity_t) for point, entity_t in self._grid.viewitems(
+            ) if entity_t != ENTITIES_NAMES['void']))
             self._actions_index += 1
         else:
             self._actions_dicts.popleft()
-            self._actions_dicts.append(dict((point, entity_t) for point, entity_t in self._grid.viewitems() if entity_t != ENTITIES_NAMES['void']))
+            self._actions_dicts.append(dict((point, entity_t) for point, entity_t in self._grid.viewitems(
+            ) if entity_t != ENTITIES_NAMES['void']))
 
     def actions_status(self):
         """Return the current len of history action and the current index
         """
         return (len(self._actions_dicts), self._actions_index)
 
+
 class HistoryMetaclass(type):
+
     """Metaclass that extend CellularGrid when
     we require an history actions manager
     """
     def __call__(cls, *args, **kwargs):
         if kwargs and kwargs.get('history', False):
             kwargs.pop('history')
-            instance = type(cls.__name__, (HistoryExtension,), cls.__dict__.copy())
+            instance = type(
+                cls.__name__, (HistoryExtension,), cls.__dict__.copy())
             setattr(instance, "_actions_dicts", deque())
             setattr(instance, "_actions_index", 0)
             setattr(instance, "_max_actions", 10)
@@ -85,11 +96,14 @@ class HistoryMetaclass(type):
             return instance.__call__(*args, **kwargs)
         instance = type(cls.__name__, (object,), cls.__dict__.copy())
         return instance.__call__(*args, **kwargs)
- 
+
+
 @add_metaclass(HistoryMetaclass)
 class CellularGrid(object):
+
     """Object that manage the grid and his entities
     """
+
     def __init__(self):
         self._grid = BaseGrid(int)
         self._grid_sel = BaseGrid(int)
@@ -200,7 +214,7 @@ class CellularGrid(object):
             # DEBUG
             #debug("get_links", ("link", (pos, type_)))
             yield (pos, type_)
- 
+
     def get_links(self):
         """Generates a tuple (position, type, id, position on source grid)
         for each link of the linked grids
@@ -234,7 +248,7 @@ class CellularGrid(object):
         #debug("delete_grid", ("linked_grids", self._linked_grids))
 
     ##
-    # Transformations section --------------------------------------------------
+    # Transformations section ------------------------------------------------
     def rotate(self, deg=90):
         """Rotates the entities selected and
         update the selction list
@@ -246,7 +260,7 @@ class CellularGrid(object):
         pivot = Point(
             min_.x + ((max_.x - min_.x) / 2.),
             min_.y + ((max_.y - min_.y) / 2.),
-            )
+        )
         new_dict = BaseGrid(int)
         new_selection = list()
         new_all = list()
@@ -266,7 +280,7 @@ class CellularGrid(object):
         self._grid.clear()
         self._grid.update(new_dict)
         self.__update_selection()
- 
+
     def flip_h(self):
         """Flips horizontally the entities selected
         and update the selection list
@@ -316,7 +330,7 @@ class CellularGrid(object):
         self._grid.clear()
         self._grid.update(new_dict)
         self.__update_selection()
-    
+
     ##
     # Edit section ------------------------------------------------------------
     def delete_selected_entities(self, links=False):
@@ -334,7 +348,7 @@ class CellularGrid(object):
                     entities = not entities
                 self.delete(point)
             return entities
-    
+
     def move_selected_entities(self, x, y):
         """Moves all selected entities
         """
@@ -359,7 +373,7 @@ class CellularGrid(object):
         #debug("move_selected_entities", ("NEW SELECTION", new_selection))
         if len(new_selection) != 0:
             self.__selection_list = new_selection
-    
+
     def move_all(self, x, y):
         """Moves the entire grid and simulates view motion
         """
@@ -391,7 +405,7 @@ class CellularGrid(object):
         """Loads selected entities on the clipboard
         """
         # DEBUG
-        #debug("load_selection")
+        # debug("load_selection")
         for point in self.__selection_list:
             # DEBUG
             #debug("load_selection", ("dict point", self._grid[point]))
@@ -401,7 +415,7 @@ class CellularGrid(object):
         """Stores the clipboard entities on the grid
         """
         # DEBUG
-        #debug("store_selection")
+        # debug("store_selection")
         #debug("store_selection", ("ALL", self.__all_selection))
         #debug("store_selection", ("SEL", self.__selection_list))
         #debug("store_selection", ("DICT SEL", self._grid_sel))
@@ -414,7 +428,7 @@ class CellularGrid(object):
                 self.insert(point, VoidEntity().type)
         for point, entity_t in entities_to_ins:
             self.insert(point, entity_t)
-        #self.update_neighbors()
+        # self.update_neighbors()
 
     def clear_selection(self):
         """Clears the current selection
@@ -439,11 +453,14 @@ class CellularGrid(object):
         # DEBUG
         #debug("select_entities", ("Item list", item_list))
         self.__all_selection = item_list
-        sel_list_app = self.__selection_list.append # Speedup append method
-        sel_list_mylinks_app = self.__selected_my_links.append # Speedup append method
-        sel_list_links_app = self.__selected_links.append # Speedup append method
-        entities_points = [point for point, entity_t in self._grid.viewitems() if entity_t != ENTITIES_NAMES["void"] and entity_t != ENTITIES_NAMES["deadcell"]]
-        #if len(self._grid_sel) == 0:
+        sel_list_app = self.__selection_list.append  # Speedup append method
+        # Speedup append method
+        sel_list_mylinks_app = self.__selected_my_links.append
+        # Speedup append method
+        sel_list_links_app = self.__selected_links.append
+        entities_points = [point for point, entity_t in self._grid.viewitems(
+        ) if entity_t != ENTITIES_NAMES["void"] and entity_t != ENTITIES_NAMES["deadcell"]]
+        # if len(self._grid_sel) == 0:
         # DEBUG
         #debug("select_entities", ("item_list", item_list))
         for point in item_list:
@@ -482,7 +499,7 @@ class CellularGrid(object):
         for position, entity_t in self._grid.viewitems():
             if entity_t != ENTITIES_NAMES["void"]:
                 yield (position, entity_t)
-        
+
         for position, entity_t in self._grid_sel.viewitems():
             if entity_t != ENTITIES_NAMES["void"]:
                 yield (position, entity_t)
@@ -498,7 +515,7 @@ class CellularGrid(object):
         """Updates the entities on the grid with their specific actions
         """
         self.__step += 1
-        
+
         # LINK UPDATE ----- count_step
         #self._links[pos] = (LINK_TYPE_NAMES["OUT"], id_, id_pos)
         # Check links IN
@@ -507,7 +524,7 @@ class CellularGrid(object):
             type_, id_, id_pos = data
             if type_ == in_id:
                 self._linked_grids[id_].insert(id_pos, self._grid[pos])
-        
+
         # Steps of linked grids
         for grid in self._linked_grids.viewvalues():
             if self.speed == grid.speed:
@@ -520,11 +537,12 @@ class CellularGrid(object):
                     #debug("UPDATE sub ===")
                     grid.update()
                     cond += step
-            elif self.speed == grid.speed + self.__step: # self.speed > grid.speed:
+            # self.speed > grid.speed:
+            elif self.speed == grid.speed + self.__step:
                     # DEBUG
                     #debug("UPDATE sub")
-                    grid.update()
-        
+                grid.update()
+
         # Step of the grid
         # DEBUG
         #debug("=== UPDATE" + self.filename)
@@ -532,25 +550,25 @@ class CellularGrid(object):
         for pos, entity_t in self._grid.items():
             if entity_t != void_id:
                 ALL_ENTITIES[entity_t].step(self, pos)
-        
+
         # DEBUG
         #debug("update", ("id", id(self)), ("list", self.__actions))
         for pos in self.__actions['del']:
             self.delete(pos)
-        
+
         for pos, type_ in self.__actions['ins']:
             self.insert(pos, type_)
-        
+
         if self.__step == self.speed - 1:
             self.__step = -1
-        
+
         # Update link out
         out_id = LINK_TYPE_NAMES["OUT"]
         for pos, data in self._links.viewitems():
             type_, id_, id_pos = data
             if type_ == out_id:
                 self.insert(pos, self._linked_grids[id_][id_pos])
-        
+
         self.__update_selection()
         del self.__actions['del'][:]
         del self.__actions['ins'][:]
@@ -573,7 +591,7 @@ class CellularGrid(object):
         if self._grid[pos] != type_:
             entity_t = ALL_ENTITIES[type_].type
         else:
-            return # Entity already exist
+            return  # Entity already exist
         self._grid[pos] = entity_t
         if ALL_ENTITIES[entity_t].neighborhood is not None:
             if ALL_ENTITIES[entity_t].neighborhood == NEIGHBORHOOD_TYPES["moore"]:
@@ -603,22 +621,22 @@ class CellularGrid(object):
                 self._grid[pos] = VoidEntity().type
             del temp_type
             # DEBUG
-            #debug("DELETE!!!")
+            # debug("DELETE!!!")
             #debug("delete", ("void", VoidEntity().type), ("entity", self._grid[pos].type))
-            #debug("DELETE!!!")
+            # debug("DELETE!!!")
 
     def clear(self):
         """Clears the current grid
         """
         self._grid.clear()
-    
+
     def clear_sparks(self):
         """Deletes all sparks on the grid
         """
         for pos, entity_t in self._grid.viewitems():
             if entity_t == ENTITIES_NAMES["spark"]:
                 self.delete(pos)
- 
+
     ##
     # Marshalling section -----------------------------------------------------
     def store(self, filename="stored.cg"):
@@ -646,13 +664,13 @@ class CellularGrid(object):
             store_dict["linked_names"] = dict()
             for id_, name in self._linked_names.viewitems():
                 store_dict["linked_names"][str(id_)] = name
-            
+
         with open(filename, "w") as fp:
             json.dump(store_dict, fp)
         #self._linked_grids = dict()
         #self._linked_names = dict()
         #self._links = dict() (LINK_TYPE_NAMES["IN"], id_, id_pos)
-    
+
     def load(self, filename="stored.cg"):
         """Loads a grid from a file
         """
@@ -661,10 +679,10 @@ class CellularGrid(object):
         # DEBUG
         #debug("load", ("base_path", base_path), ("filename", filename))
         self.__filename = filename
-        
+
         with open(filename, "r") as fp:
             stored_dict = json.load(fp)
-        
+
         for type_, list_ in stored_dict.viewitems():
             if type_ == "my_links":
                 for sub_type, sub_list in list_.viewitems():
@@ -685,10 +703,12 @@ class CellularGrid(object):
                     id_pos = Point(id_pos[0], id_pos[1])
                     if id_ not in added:
                         new_grid = CellularGrid()
-                        new_grid.load(path.join(base_path, stored_dict["linked_names"][str(id_)]))
+                        new_grid.load(
+                            path.join(base_path, stored_dict["linked_names"][str(id_)]))
                         added[id_] = id(new_grid)
                         grids_container[id_] = new_grid
-                    self._linked_names[added[id_]] = stored_dict["linked_names"][str(id_)]
+                    self._linked_names[added[id_]] = stored_dict[
+                        "linked_names"][str(id_)]
                     self._linked_grids[added[id_]] = grids_container[id_]
                     self._links[pos] = (type_, added[id_], id_pos)
             elif type_ in ENTITIES_NAMES:
