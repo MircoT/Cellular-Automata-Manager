@@ -551,77 +551,77 @@ class DrawWindow(MyGLCanvas):
                 if ENTITIES_IDS[entity] in self.__resman.entity:
                     self.draw_image(ENTITIES_IDS[entity], x_c, y_c, TS, TS, )
 
-        self.SwapBuffers()
-
-    ##
-    # Function that draws all entities on screen with pygame ------------------
-    def Redraw(self):
-        """Method called to draw
-        """
-        if self._size_t_dirty:
-            self._screen = pygame.Surface(self._size_t, 0, 24)
-            self._size_t_dirty = False
-
-        
-
-        # Draw scrollbars -----
-        if self.__show_hor_scrol:
-            self._screen.fill((221, 221, 223), [0, win_y - 16, win_x, win_y])
-            self._screen.blit(
-                self.__resman.entity.arrowright, (win_x - 16, win_y - 16))
-            self._screen.blit(self.__resman.entity.arrowleft, (0, win_y - 16))
-        if self.__show_ver_scrol:
-            self._screen.fill((221, 221, 223), [win_x - 16, 0, win_x, win_y])
-            self._screen.blit(self.__resman.entity.arrowup, (win_x - 16, 0))
-            self._screen.blit(
-                self.__resman.entity.arrowdown, (win_x - 16, win_y - 16))
         ##
         # Minimap
-        #  ________________________
-        # |                        |
-        # |        ________        |
-        # |       |        |       |
-        # |       |        |       |
-        # |       |________|       |
-        # |                        |
-        # |________________________|
+        #  ________________________  _             _
+        # |                        | |  win_y / TS |
+        # |        ________        | |             |
+        # |       |        |       | -             |
+        # |       |        |       |               | 3x
+        # |       |________|       |               |
+        # |                        |               |
+        # |________________________|               |
+        #                                          -
+        # |-----|
+        #  win_x / TS
+        # |------------------------|
+        #            3x
         #
-        # top left corner = (0, win_y - (win_y / TS)*3)
-        # width = ((win_x / TS)*3, (win_y / TS)*3)
-        #
-        # top left corner of inner box = ((win_x / TS), win_y - (win_y / TS)*2)
-        # width inner box = (win_x / TS, win_y / TS)
         #
         # scale = 1 cell : 1 pixel on minimap
+        # central rect is che current view, what the
+        # user can see in the canvas and the outside
+        # is the neighborhood
         #
-        #--
         if self.__minimap:
-            # External map
+            x_step = win_x / TS
+            y_step = win_y / TS
+            m_width = x_step * 3
+            m_height = y_step * 3
 
-            pygame.draw.rect(self._screen, (75, 75, 75),
-                             [0, win_y - (win_y / TS)*3,
-                              (win_x / TS)*3, (win_y / TS)*3],
-                             3)
-            self._screen.fill(
-                (255, 255, 255), [0, win_y - (win_y / TS)*3, (win_x / TS)*3, (win_y / TS)*3])
-            # Map view
-            pygame.draw.rect(self._screen, (75, 75, 75),
-                             [(win_x / TS), win_y - (win_y / TS)
-                              * 2, win_x / TS, win_y / TS],
-                             3)
-            self._screen.fill(
-                (255, 255, 255), [(win_x / TS), win_y - (win_y / TS)*2, win_x / TS, win_y / TS])
-            for p in points:
-                pygame.draw.rect(self._screen, (75, 75, 75),
-                                 [p.x, p.y, 1, 1],
-                                 1)
+            gl.glColor4f(0.96, 0.96, 0.96, 1.0)
+            gl.glRectf(0, 0, m_width, m_height)
 
-        # Convert the surface to an RGB string
-        temp_s = pygame.image.tostring(self._screen, 'RGB')
-        # Load this string into a wx image
-        img = wx.ImageFromData(self._size_t[0], self._size_t[1], temp_s)
-        # Get the image in bitmap form because
-        # we can't render an image directly on context
-        bmp = wx.BitmapFromImage(img)
-        # Blit the bitmap image to the display
-        self._wx_dc.DrawBitmap(bmp, 0, 0, False)
+            self.draw_line(0, 0, m_width, 0,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(0, m_height, m_width, m_height,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(0, 0, 0, m_height,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(m_width, 0, m_width, m_height,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+
+            self.draw_line(x_step, y_step, m_width-x_step, y_step,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(x_step, y_step*2, m_width-x_step, y_step*2,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(x_step, y_step, x_step, m_height-y_step,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+            self.draw_line(x_step*2, y_step, x_step*2, m_height-y_step,
+                           color=(0.05, 0.05, 0.05, 1.0),
+                           width=0.3)
+
+            gl.glColor4f(0.10, 0.10, 0.10, 1.0)
+            for c_x, c_y in points:
+                gl.glRectf(c_x, win_y-c_y, c_x+1, win_y-c_y+1)
+
+        ##
+        # Draw scrollbars
+        if self.__show_hor_scrol:
+            self.draw_rect(0, 0, win_x, TS, color=(0.9, 0.9, 0.9, 0.6))
+            self.draw_image('arrowright', win_x - TS, 0, TS, TS)
+            self.draw_image('arrowleft', 0, 0, TS, TS)
+        if self.__show_ver_scrol:
+            self.draw_rect(
+                win_x - TS, 0, TS, win_y, color=(0.9, 0.9, 0.9, 0.6))
+            self.draw_image('arrowup', win_x - TS, win_y - TS, TS, TS)
+            self.draw_image('arrowdown', win_x - TS, 0, TS, TS)
+
+        self.SwapBuffers()
