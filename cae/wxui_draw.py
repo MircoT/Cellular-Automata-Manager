@@ -62,7 +62,7 @@ class DrawWindow(MyGLCanvas):
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
         self.Bind(wx.EVT_RIGHT_UP, self.OnMouseRightUp)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseLeftDown)
-        self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        self.Bind(wx.EVT_CHAR_HOOK, self.OnCharHook)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
 
     def on_cut(self):
@@ -345,7 +345,7 @@ class DrawWindow(MyGLCanvas):
             self.__cg.clear_selection()
             # self.UpdateDrawing()
 
-    def OnKeyDown(self, e):
+    def OnCharHook(self, e):
         """Keyboard's events
         """
         # DEBUG
