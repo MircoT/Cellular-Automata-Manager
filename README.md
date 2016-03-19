@@ -49,7 +49,7 @@ to use the command ```which cam-env``` to search the executable.
 
 If you made an executable, you can run the application by running it.
 
-Is available an executable version for *Windows*, that can be used with [wine](https://www.winehq.org/) also in *Mac* and *Linux*. You can find source and packages [here](https://github.com/MircoT/Cellular-Automata-Manager/releases).
+Is available an executable version for *Windows*, that can be used with [wine](https://www.winehq.org/) also in *Mac* and *Linux*. You can find sources and packages [here](https://github.com/MircoT/Cellular-Automata-Manager/releases).
 
 ## Contributing
 
