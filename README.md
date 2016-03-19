@@ -28,7 +28,7 @@ python setup.py install
 
 You can use [pyinstaller](http://www.pyinstaller.org/) to make a standalone executable of the program:
 ```bash
-python main.spec main.py
+pyinstaller main.spec main.py
 ```
 
 ## Run the application
@@ -49,7 +49,7 @@ to use the command ```which cam-env``` to search the executable.
 
 If you made an executable, you can run the application by running it.
 
-For the moment is available also a temporary version of the executable for windows, useful if you want to use the program without install all the dependencies, also on linux and osx with [wine](https://www.winehq.org/). You can download it [here](https://dl.dropboxusercontent.com/u/16546001/cam.zip)
+Is available an executable version for *Windows*, that can be used with [wine](https://www.winehq.org/) also in *Mac* and *Linux*. You can find source and packages [here](https://github.com/MircoT/Cellular-Automata-Manager/releases).
 
 ## Contributing
 
