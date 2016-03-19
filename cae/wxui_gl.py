@@ -73,6 +73,9 @@ class MyGLCanvas(GLCanvas):
         # Lines
         gl.glEnable(gl.GL_LINE_SMOOTH)
         gl.glLineWidth(1.0)
+        # Alpha
+        gl.glEnable(gl.GL_ALPHA_TEST)
+        gl.glAlphaFunc(gl.GL_GREATER, 0)
 
     def _set_viewport(self):
         """Set viewport size as Client dimension."""
