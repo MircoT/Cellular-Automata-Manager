@@ -2,7 +2,7 @@ from math import sin, cos, radians
 from collections import namedtuple
 import logging
 
-__version__ = "1.1"
+__version__ = "1.1.1"
 
 # Point type
 Point = namedtuple("Point", ('x', 'y'))

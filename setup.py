@@ -50,7 +50,7 @@ def main():
     setup(
         name='cellular-automata-manager',
         zip_safe=False,
-        version="1.1",
+        version="1.1.1",
         author="Tracolli Mirco",
         author_email='mirco.theone@gmail.com',
         description='Open source environment for cellular automata.',
