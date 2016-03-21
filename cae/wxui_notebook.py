@@ -211,7 +211,7 @@ class GridNotebook(wx.aui.AuiNotebook):
         """
         self.__ca_list.append(CellularGrid(history=True))
         self.__ca_loop.append(False)
-        self.__renderer_list.append(DrawWindow(self))
+        self.__renderer_list.append(DrawWindow(self, fps=30.))
         if self.__parent.GetMinimapStatus():
             self.__renderer_list[-1].toggle_minimap()
         self.__renderer_list[-1].SetFocus()

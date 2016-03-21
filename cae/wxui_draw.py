@@ -47,17 +47,7 @@ class DrawWindow(MyGLCanvas):
 
         self.__notman = None  # Notebook manager
         self._size_t = self.GetSizeTuple()  # Window size
-        self._screen = None
-        # Device context for drawing the bitmap
-        self._wx_dc = None
-        # Timer -----
-        self.timer = wx.Timer(self)
-        self.fps = 30
-        self.timespacing = 1000.0 / self.fps
-        # Start timer -----
-        self.timer.Start(self.timespacing, False)
-        # Events binding -----
-        self.Bind(wx.EVT_TIMER, self.update, self.timer)
+
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
         self.Bind(wx.EVT_RIGHT_UP, self.OnMouseRightUp)
@@ -84,21 +74,6 @@ class DrawWindow(MyGLCanvas):
         """Update selected links
         """
         self.__link_selection = selection
-
-    def start_timer(self):
-        """Starts the timer
-        """
-        self.timer.Start(self.timespacing, False)
-
-    def stop_timer(self):
-        """Stops the timer
-        """
-        self.timer.Stop()
-
-    def status_timer(self):
-        """Return True if the timer is running
-        """
-        return self.timer.IsRunning()
 
     def toggle_minimap(self):
         """Toggle minimap status
@@ -415,18 +390,6 @@ class DrawWindow(MyGLCanvas):
         # frames etc.)
         self.draw()
 
-    def Kill(self):
-        """Unbinding all methods whichcall the Redraw()
-        """
-        # Make sure Pygame can't be asked to redraw /before/ quitting by unbinding all methods which
-        # call the Redraw() method
-        # (Otherwise wx seems to call Draw between quitting Pygame and destroying the frame)
-        # This may or may not be necessary now that Pygame is just drawing to
-        # surfaces
-        self.Unbind(event=wx.EVT_PAINT, handler=self.OnPaint)
-        self.Unbind(event=wx.EVT_TIMER, handler=self.Update, source=self.timer)
-        del self._wx_dc
-
     ##
     # Support functions for drawing
     def __add_on_minimap(self, win_x, win_y, x_c, y_c, list_):
@@ -500,9 +463,9 @@ class DrawWindow(MyGLCanvas):
                 except TypeError:
                     pass
                 if type_ == LINK_TYPE_NAMES["IN"]:
-                    self.draw_image('linkin', x_c, y_c, TS, TS)
+                    self.draw_image('linkin', x_c, y_c, size=(TS, TS))
                 elif type_ == LINK_TYPE_NAMES["OUT"]:
-                    self.draw_image('linkout', x_c, y_c, TS, TS)
+                    self.draw_image('linkout', x_c, y_c, size=(TS, TS))
 
         ##
         # Draw links
@@ -532,9 +495,11 @@ class DrawWindow(MyGLCanvas):
                 except TypeError:
                     pass
                 if type_ == LINK_TYPE_NAMES["IN"]:
-                    self.draw_image('linkin', x_c, y_c, TS, TS)
+                    self.draw_image(
+                        'linkin', x_c, y_c, size=(TS, TS), origin=(0.0, 0.0))
                 elif type_ == LINK_TYPE_NAMES["OUT"]:
-                    self.draw_image('linkout', x_c, y_c, TS, TS)
+                    self.draw_image(
+                        'linkout', x_c, y_c, size=(TS, TS), origin=(0.0, 0.0))
 
         ##
         # Draw entities
@@ -549,7 +514,8 @@ class DrawWindow(MyGLCanvas):
                 # DEBUG
                 # debug("Draw", ("position", (x_c, y_c)))
                 if ENTITIES_IDS[entity] in self.__resman.entity:
-                    self.draw_image(ENTITIES_IDS[entity], x_c, y_c, TS, TS, )
+                    self.draw_image(ENTITIES_IDS[entity], x_c, y_c,
+                                    size=(TS, TS), origin=(0.0, 0.0))
 
         ##
         # Minimap
@@ -578,6 +544,9 @@ class DrawWindow(MyGLCanvas):
             y_step = win_y / TS
             m_width = x_step * 3
             m_height = y_step * 3
+
+            gl.glMatrixMode(gl.GL_MODELVIEW)
+            gl.glLoadIdentity()
 
             gl.glColor4f(0.96, 0.96, 0.96, 1.0)
             gl.glRectf(0, 0, m_width, m_height)
@@ -616,12 +585,16 @@ class DrawWindow(MyGLCanvas):
         # Draw scrollbars
         if self.__show_hor_scrol:
             self.draw_rect(0, 0, win_x, TS, color=(0.9, 0.9, 0.9, 0.6))
-            self.draw_image('arrowright', win_x - TS, 0, TS, TS)
-            self.draw_image('arrowleft', 0, 0, TS, TS)
+            self.draw_image(
+                'arrowright', win_x - TS, 0, size=(TS, TS), origin=(0.0, 0.0))
+            self.draw_image(
+                'arrowleft', 0, 0, size=(TS, TS), origin=(0.0, 0.0))
         if self.__show_ver_scrol:
             self.draw_rect(
                 win_x - TS, 0, TS, win_y, color=(0.9, 0.9, 0.9, 0.6))
-            self.draw_image('arrowup', win_x - TS, win_y - TS, TS, TS)
-            self.draw_image('arrowdown', win_x - TS, 0, TS, TS)
+            self.draw_image(
+                'arrowup', win_x - TS, win_y - TS, size=(TS, TS), origin=(0.0, 0.0))
+            self.draw_image(
+                'arrowdown', win_x - TS, 0, size=(TS, TS), origin=(0.0, 0.0))
 
         self.SwapBuffers()
