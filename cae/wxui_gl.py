@@ -126,7 +126,6 @@ class MyGLCanvas(GLCanvas):
         self._wx_size = self.GetSize()
         self._size_t = self.GetSizeTuple()
         self.SetCurrent(self._gl_context)
-        gl.glViewport(0, 0, self._wx_size.width, self._wx_size.height)
         self._conf_2d_env()
 
     def def_clear_color(self, r=0.0, g=0.0, b=0.0, a=1.0):
