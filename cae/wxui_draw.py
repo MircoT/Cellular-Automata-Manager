@@ -400,6 +400,7 @@ class DrawWindow(MyGLCanvas):
 
     def draw(self):
         self.SetCurrent(self._gl_context)
+        gl.glClearColor(1.0, 1.0, 1.0, 1.0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
         gl.glLoadIdentity()
 
@@ -501,6 +502,12 @@ class DrawWindow(MyGLCanvas):
                     self.draw_image(
                         'linkout', x_c, y_c, size=(TS, TS), origin=(0.0, 0.0))
 
+        #diable render screen
+        self.enable_render_to_texture()
+
+        gl.glClearColor(0.0, 0.0, 0.0, 0.0)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+        gl.glLoadIdentity()
         ##
         # Draw entities
         for position, entity in self.__cg.get_entities():
@@ -516,6 +523,28 @@ class DrawWindow(MyGLCanvas):
                 if ENTITIES_IDS[entity] in self.__resman.entity:
                     self.draw_image(ENTITIES_IDS[entity], x_c, y_c,
                                     size=(TS, TS), origin=(0.0, 0.0))
+        # enable render screen
+        self.enable_render_to_screen()
+        #self.draw_image('__tbo__', 0, 0, size=(512, 512), origin=(0.0, 0.0))
+
+        gl.glEnable(gl.GL_TEXTURE_2D)
+        # Begin QUAD
+        gl.glBegin(gl.GL_QUADS)
+
+        gl.glTexCoord2f(0, 0)
+        gl.glVertex2f(0.0, 0.0)
+
+        gl.glTexCoord2f(1, 0)
+        gl.glVertex2f(1.0, 0.0)
+
+        gl.glTexCoord2f(1, 1)
+        gl.glVertex2f(1.0, 1.0)
+
+        gl.glTexCoord2f(0, 1)
+        gl.glVertex2f(0.0, 1.0)
+
+        gl.glEnd()
+
 
         ##
         # Minimap

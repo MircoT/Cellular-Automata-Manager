@@ -1,6 +1,7 @@
 #! *-* coding: utf-8 *-*
 import wx
 import OpenGL.GL as gl
+from OpenGL.GL.framebufferobjects import *
 from wx.glcanvas import GLCanvas, GLContext
 from PIL import Image, PngImagePlugin, BmpImagePlugin
 from collections import namedtuple
@@ -37,6 +38,34 @@ class MyGLCanvas(GLCanvas):
         self._wx_size = wx.Size(42, 42)
         self._size_t = self.GetSizeTuple()
         self._textures = {}
+        #enable OpenGL context for make the tbo and fbo
+        self.SetCurrent(self._gl_context)
+        # build TBO
+        self._tbo = gl.glGenTextures(1)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self._tbo)
+        gl.glTexParameterf(
+            gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+        gl.glTexParameterf(
+            gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D,
+                        0,
+                        gl.GL_RGBA,
+                        wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X),
+                        wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y),
+                        0,
+                        gl.GL_RGBA,
+                        gl.GL_UNSIGNED_BYTE,
+                        None)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
+        # build FBO
+        self._fbo = glGenFramebuffers(1)
+        glBindFramebuffer(gl.GL_FRAMEBUFFER, self._fbo)
+        glFramebufferTexture2D(gl.GL_FRAMEBUFFER,
+                               gl.GL_COLOR_ATTACHMENT0,
+                               gl.GL_TEXTURE_2D,
+                               self._tbo,
+                               0)
+        glBindFramebuffer(gl.GL_FRAMEBUFFER, 0)
 
         self._fps = kwargs.get('fps', None)
 
@@ -55,6 +84,12 @@ class MyGLCanvas(GLCanvas):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
         self._init_GL()
+
+    def enable_render_to_texture(self):
+        glBindFramebuffer(gl.GL_FRAMEBUFFER, self._fbo)
+
+    def enable_render_to_screen(self):
+        glBindFramebuffer(gl.GL_FRAMEBUFFER, 0)
 
     def Kill(self):
         """Unbinding all methods whichcall the Redraw()
@@ -100,6 +135,9 @@ class MyGLCanvas(GLCanvas):
         self.def_clear_color(0.98, 0.98, 0.98, 1.0)
         if self._env_type == GLENV.env2d:
             self._conf_2d_env()
+            self.enable_render_to_texture()
+            self._conf_2d_env()
+            self.enable_render_to_screen()
         else:
             raise Exception('3D context not yet implemented')
         self.SwapBuffers()
@@ -238,7 +276,10 @@ class MyGLCanvas(GLCanvas):
         """
         # Enable TEXTURE_2D
         gl.glEnable(gl.GL_TEXTURE_2D)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, self._textures[name])
+        if name == '__tbo__':
+            gl.glBindTexture(gl.GL_TEXTURE_2D, self._tbo)
+        else:
+            gl.glBindTexture(gl.GL_TEXTURE_2D, self._textures[name])
 
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glLoadIdentity()
